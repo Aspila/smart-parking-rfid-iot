@@ -1,189 +1,127 @@
 # Smart Parking RFID IoT
 
-Sistem ini dibuat untuk proposal **Implementasi Teknologi RFID pada Sistem Parkir Cerdas Berbasis Internet of Things (IoT) di Lingkungan Kampus**.
+Proyek prototipe **sistem parkir cerdas berbasis web dan Internet of Things (IoT)** yang mengintegrasikan RFID, ESP32, API, dan database MySQL. Sistem ini dirancang untuk mendukung validasi akses kendaraan serta pemantauan aktivitas parkir melalui dashboard web.
 
-## Fitur Utama
+> **Status proyek:** prototipe untuk pembelajaran, demonstrasi, dan pengembangan. Lakukan pengujian perangkat serta peninjauan keamanan sebelum digunakan di lingkungan operasional.
 
-1. Login admin dan petugas.
-2. Dashboard monitoring dengan ringkasan pengguna, kartu RFID, kendaraan, log akses, kapasitas, dan aktivitas harian.
-3. Kelola data pengguna: mahasiswa, dosen, staf, dan tamu.
-4. Kelola data kendaraan dan nomor polisi.
-5. Kelola kartu RFID: KTM, e-KTP, kartu tamu, dan kartu khusus.
-6. Validasi UID kartu terdaftar, aktif, terhubung dengan pengguna, dan masa berlaku.
-7. Simulasi scan RFID dari website.
-8. API scan RFID untuk ESP32 atau ESP8266.
-9. Riwayat akses masuk dan keluar.
-10. Laporan aktivitas parkir berdasarkan periode.
-11. Pengaturan gerbang, area parkir, kapasitas, dan durasi servo.
-12. Kode Arduino untuk RFID RC522 dan servo palang otomatis.
+## Fitur
 
-## Kebutuhan
+- Login admin/petugas dan dashboard ringkasan aktivitas.
+- Pengelolaan data pengguna, kendaraan, kartu RFID, gerbang, dan area parkir.
+- Validasi UID RFID berdasarkan status kartu, pengguna, dan masa berlaku.
+- API untuk menerima pemindaian dari ESP32/ESP8266.
+- Riwayat akses masuk/keluar dan akses yang ditolak.
+- Laporan aktivitas parkir berdasarkan periode.
+- Monitoring IoT dan endpoint pemeriksaan API.
+- Kontrol servo palang serta indikator LED/buzzer pada sketch mikrokontroler.
+- Simulasi perangkat melalui Wokwi.
+- Dokumentasi alur sistem, struktur database, dan skenario pengujian Black Box.
 
-- XAMPP dengan PHP 8.x dan MySQL atau MariaDB.
-- Browser modern.
-- ESP32 atau ESP8266.
-- RFID RC522.
-- Motor servo.
-- Kabel jumper dan sumber daya 5V.
+## Teknologi
 
-## Instalasi di XAMPP
+- **Backend:** PHP
+- **Database:** MySQL/MariaDB
+- **Frontend:** HTML, CSS, JavaScript, Bootstrap
+- **IoT:** ESP32/ESP8266, RFID RC522, servo, LED, buzzer
+- **Firmware:** Arduino C++
+- **Simulasi:** Wokwi
+- **Lingkungan pengembangan lokal:** XAMPP atau Laragon
 
-1. Ekstrak folder ini ke:
+## Arsitektur singkat
 
-   `C:\xampp\htdocs\smart-parking-rfid-iot-v2`
+1. Kartu RFID ditempelkan ke reader RC522.
+2. ESP32 membaca UID kartu dan mengirimkannya ke endpoint API.
+3. API PHP memvalidasi UID terhadap data pada MySQL.
+4. API memberikan respons akses diterima/ditolak dalam format JSON.
+5. Jika akses diterima, firmware menjalankan servo untuk membuka palang dan memberi indikator melalui LED/buzzer.
+6. Aktivitas dicatat pada riwayat akses dan ditampilkan di dashboard web.
 
-2. Jalankan **Apache** dan **MySQL** dari XAMPP Control Panel.
-
-3. Buka phpMyAdmin.
-
-4. Import file:
-
-   `database/smart_parking_rfid.sql`
-
-5. Buka sistem di browser:
-
-   `http://localhost/smart-parking-rfid-iot-v2/`
-
-## Akun Awal
-
-- Username: `admin`
-- Password: `admin123`
-
-## UID Kartu Awal untuk Uji Coba
-
-- `04A1B2C3D4`
-- `04D5E6F7A8`
-- `04ABCDEF12`
-- `04F1F2F3F4`
-
-UID lain akan ditolak oleh sistem.
-
-## Endpoint API
-
-### 1. Scan RFID
-
-`GET /api/scan.php?uid=04A1B2C3D4&gate_id=1&area_id=1`
-
-Contoh respons diterima:
-
-```json
-{
-  "success": true,
-  "status": "Diterima",
-  "message": "Akses valid",
-  "uid": "04A1B2C3D4",
-  "jenis_akses": "Masuk",
-  "nama_user": "Agam As Perila",
-  "servo": "OPEN",
-  "delay_ms": 3000
-}
-```
-
-Contoh respons ditolak:
-
-```json
-{
-  "success": false,
-  "status": "Ditolak",
-  "message": "Kartu tidak terdaftar",
-  "servo": "CLOSE"
-}
-```
-
-### 2. Riwayat Terbaru
-
-`GET /api/latest.php?limit=10`
-
-### 3. Statistik Dashboard
-
-`GET /api/stats.php`
-
-### 4. Heartbeat Gerbang
-
-`GET /api/device-heartbeat.php?gate_id=1`
-
-## Menghubungkan ESP32 atau ESP8266
-
-1. Buka file:
-
-   `arduino/esp32_rfid_servo_smart_parking.ino`
-
-2. Ubah SSID dan password WiFi.
-
-3. Ubah alamat API sesuai IP komputer XAMPP.
-
-   Contoh:
-
-   `http://192.168.1.5/smart-parking-rfid-iot-v2/api/scan.php`
-
-4. Upload kode ke board.
-
-5. Tempelkan kartu RFID ke reader.
-
-6. Jika UID valid, API mengirim instruksi `OPEN`, servo membuka palang, lalu sistem mencatat log akses.
-
-## Struktur Folder
+## Struktur repositori
 
 ```text
-smart-parking-rfid-iot-v2/
-├── api/
-├── arduino/
-├── assets/
-├── config/
-├── database/
-├── includes/
+smart-parking-rfid-iot/
+├── api/                 # Endpoint scan, statistik, heartbeat, dan pemeriksaan API
+├── arduino/             # Sketch ESP32/ESP8266
+├── assets/              # CSS dan JavaScript antarmuka
+├── config/              # Konfigurasi koneksi database
+├── database/            # SQL schema dan data contoh
+├── docs/                # Alur sistem, struktur database, pengujian Black Box
+├── includes/            # Komponen dan fungsi PHP bersama
+├── wokwi/               # Sketch dan diagram simulasi Wokwi
 ├── dashboard.php
-├── users.php
-├── vehicles.php
-├── rfid_cards.php
-├── scan.php
-├── access_logs.php
-├── reports.php
-├── gates.php
-├── settings.php
-└── login.php
+├── iot_monitor.php
+├── login.php
+└── README.md
 ```
 
-## Catatan Penting
+## Persyaratan
 
-- File `config/database.php` memakai konfigurasi standar XAMPP: user `root`, password kosong.
-- Jika nama database berbeda, ubah nilai `$DB_NAME` pada file tersebut.
-- Untuk akses dari ESP32 atau ESP8266, gunakan IP komputer, bukan `localhost`.
+- PHP 8.x dengan ekstensi PDO MySQL aktif.
+- MySQL atau MariaDB.
+- XAMPP atau Laragon.
+- Browser modern.
+- Untuk perangkat fisik: ESP32/ESP8266, MFRC522, servo, LED, buzzer, dan kabel yang sesuai.
 
-## Update v7 Live IoT Monitor
+## Cara menjalankan aplikasi web secara lokal
 
-Versi ini menambahkan halaman `iot_monitor.php` untuk membantu pengujian Wokwi atau ESP32 melalui ngrok.
+1. Unduh atau clone repositori ini ke folder web server lokal, misalnya `C:\xampp\htdocs\smart-parking-rfid-iot` atau folder `www` Laragon.
+2. Jalankan Apache dan MySQL dari XAMPP/Laragon.
+3. Buka phpMyAdmin, pilih menu **Import**, lalu impor `database/smart_parking_rfid.sql`.
+4. Periksa `config/database.php`. Sesuaikan host, nama database, username, dan password dengan konfigurasi lokal.
+5. Buka `http://localhost/smart-parking-rfid-iot/` (sesuaikan dengan nama folder yang digunakan).
+6. Login menggunakan akun demo di bawah, lalu ganti password setelah masuk jika fitur pengelolaan akun tersedia.
 
-Fitur tambahan:
+### Akun demo lokal
 
-1. Menampilkan URL API yang harus dimasukkan ke `API_URL` pada sketch Wokwi.
-2. Tombol cek API melalui `api/ping.php`.
-3. Tombol test UID valid dan UID salah langsung dari web.
-4. Live riwayat scan yang otomatis refresh setiap 2,5 detik.
-5. API `scan.php` menerima GET, POST form, dan POST JSON.
-6. API menambahkan header CORS dan header no-cache.
+- **Username:** `admin`
+- **Password:** `admin123`
 
-Urutan uji cepat:
+Akun tersebut hanya untuk pengujian lokal. Jangan gunakan kredensial demo di server publik atau produksi.
 
-1. Jalankan Laragon.
-2. Buka web dan login.
-3. Buka menu `Live IoT`.
-4. Klik `Cek API`.
-5. Klik `Test UID Valid`.
-6. Cek apakah riwayat scan bertambah.
-7. Salin URL API ke `API_URL` pada sketch Wokwi.
-8. Jalankan simulasi Wokwi.
-9. Tempel kartu atau tekan tombol UID valid.
-10. Lihat halaman `Live IoT` atau `Riwayat Akses`.
+> **Peringatan database:** file SQL berisi perintah untuk menghapus dan membuat ulang tabel pada database `smart_parking_rfid`. Impor hanya ke database pengujian yang datanya boleh diganti. Cadangkan data terlebih dahulu jika database sudah berisi data penting.
 
-Jika memakai domain Laragon `.test`, contoh perintah ngrok:
+## Menjalankan simulasi Wokwi
 
-```bash
-ngrok http --host-header=smart-parking-rfid-iot-v7-live-monitor.test 80
-```
+1. Buka folder `wokwi/` dan impor `diagram.json`, `sketch.ino`, serta `libraries.txt` ke proyek Wokwi yang sesuai.
+2. Jalankan web lokal terlebih dahulu dan pastikan endpoint API dapat diakses.
+3. Untuk menghubungkan simulasi Wokwi ke server lokal, ikuti `wokwi/CARA_PAKAI_WOKWI_NGROK.md`.
+4. Ganti placeholder `API_URL` di `wokwi/sketch.ino` dengan URL endpoint API milikmu.
+5. Jalankan simulasi dan uji UID valid maupun tidak terdaftar. Periksa respons API, dashboard, dan riwayat akses.
 
-Jika memakai folder localhost, contoh perintah ngrok:
+Jangan mengunggah URL tunnel aktif, token, password Wi-Fi pribadi, atau kredensial server ke repositori publik.
 
-```bash
-ngrok http 80
-```
+## Menjalankan firmware di perangkat ESP32
+
+1. Buka `arduino/esp32_rfid_servo_smart_parking.ino` melalui Arduino IDE.
+2. Pilih board dan port yang sesuai.
+3. Pasang library yang diperlukan: `MFRC522`, `ArduinoJson`, dan `ESP32Servo` untuk ESP32.
+4. Isi `WIFI_SSID`, `WIFI_PASSWORD`, dan `API_URL` dengan nilai lokal milikmu. Jangan menggunakan kredensial Wi-Fi pribadi di file yang akan dipublikasikan.
+5. Pastikan ESP32 dan server berada pada jaringan yang dapat saling menjangkau. Untuk server lokal, gunakan alamat IP komputer server, bukan `localhost`.
+6. Upload sketch, buka Serial Monitor pada baud rate `115200`, lalu uji kartu.
+
+Periksa `arduino/esp8266_pin_note.txt` apabila menyesuaikan proyek untuk ESP8266. Wiring dan dukungan pin harus diverifikasi sesuai board dan modul yang dipakai.
+
+## Endpoint API utama
+
+| Endpoint | Kegunaan |
+|---|---|
+| `api/scan.php` | Memvalidasi UID dan mencatat akses RFID |
+| `api/latest.php` | Mengambil riwayat scan terbaru |
+| `api/stats.php` | Mengambil statistik untuk dashboard |
+| `api/ping.php` | Memeriksa respons API |
+| `api/device-heartbeat.php` | Memperbarui status komunikasi gerbang/perangkat |
+| `api/register-uid.php` | Endpoint terkait pendaftaran UID |
+
+Endpoint membutuhkan konfigurasi aplikasi dan database yang sesuai. Lihat kode di folder `api/` untuk parameter dan format respons yang tersedia.
+
+## Dokumentasi
+
+- [Alur Sistem](docs/ALUR_SISTEM.md)
+- [Struktur Database](docs/STRUKTUR_DATABASE.md)
+- [Panduan Pengujian Black Box](docs/PANDUAN_PENGUJIAN_BLACKBOX.md)
+- [Panduan Wokwi + ngrok](wokwi/CARA_PAKAI_WOKWI_NGROK.md)
+
+
+## Tujuan proyek
+
+Proyek ini dibuat sebagai sarana pembelajaran integrasi aplikasi web, database, API, dan perangkat IoT untuk proses parkir berbasis RFID. Kontribusi, masukan, dan saran perbaikan sangat dihargai.
