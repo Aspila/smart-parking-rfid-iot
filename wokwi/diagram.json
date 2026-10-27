@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "author": "ChatGPT",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 19.2, "left": -91.16, "attrs": {} },
+    { "type": "board-mfrc522", "id": "rfid1", "top": -153.24, "left": 198.4, "attrs": { "uid": "01:02:03:04" } },
+    { "type": "wokwi-servo", "id": "servo1", "top": 37.4, "left": 278.4, "rotate": 90, "attrs": {} },
+    { "type": "wokwi-led", "id": "ledGreen", "top": 178.8, "left": 232.2, "attrs": { "color": "green" } },
+    { "type": "wokwi-led", "id": "ledRed", "top": 178.8, "left": 309, "attrs": { "color": "red" } },
+    { "type": "wokwi-buzzer", "id": "bz1", "top": 179.4, "left": 385.8, "attrs": { "volume": "0.1" } },
+    { "type": "wokwi-pushbutton", "id": "btnValid", "top": 217.4, "left": -240, "attrs": { "color": "green", "label": "UID Valid" } },
+    { "type": "wokwi-pushbutton", "id": "btnInvalid", "top": 294.2, "left": -240, "attrs": { "color": "red", "label": "UID Ditolak" } },
+    { "type": "wokwi-text", "id": "txt1", "top": -198.4, "left": 178.8, "attrs": { "text": "RFID MFRC522\nKlik reader, pilih kartu, lalu Tap" } },
+    { "type": "wokwi-text", "id": "txt2", "top": 272, "left": 224, "attrs": { "text": "Hijau = diterima\nMerah = ditolak\nServo = palang" } }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+
+    [ "rfid1:3.3V", "esp:3V3", "red", [ "v0" ] ],
+    [ "rfid1:GND", "esp:GND.1", "black", [ "v0" ] ],
+    [ "rfid1:SDA", "esp:5", "green", [ "v0" ] ],
+    [ "rfid1:SCK", "esp:18", "green", [ "v0" ] ],
+    [ "rfid1:MOSI", "esp:23", "green", [ "v0" ] ],
+    [ "rfid1:MISO", "esp:19", "green", [ "v0" ] ],
+    [ "rfid1:RST", "esp:21", "green", [ "v0" ] ],
+
+    [ "servo1:PWM", "esp:13", "orange", [ "v0" ] ],
+    [ "servo1:V+", "esp:5V", "red", [ "v0" ] ],
+    [ "servo1:GND", "esp:GND.2", "black", [ "v0" ] ],
+
+    [ "ledGreen:A", "esp:26", "green", [ "v0" ] ],
+    [ "ledGreen:C", "esp:GND.2", "black", [ "v0" ] ],
+    [ "ledRed:A", "esp:25", "red", [ "v0" ] ],
+    [ "ledRed:C", "esp:GND.2", "black", [ "v0" ] ],
+
+    [ "bz1:1", "esp:27", "orange", [ "v0" ] ],
+    [ "bz1:2", "esp:GND.2", "black", [ "v0" ] ],
+
+    [ "btnValid:1.r", "esp:GND.1", "black", [ "v0" ] ],
+    [ "btnValid:2.r", "esp:32", "green", [ "v0" ] ],
+    [ "btnInvalid:1.r", "esp:GND.1", "black", [ "v0" ] ],
+    [ "btnInvalid:2.r", "esp:33", "red", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}

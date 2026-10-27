@@ -1,0 +1,9 @@
+Catatan pin untuk ESP8266 NodeMCU:
+- SS/SDA RC522: D2
+- RST RC522: D1
+- SCK: D5
+- MOSI: D7
+- MISO: D6
+- Servo: D4
+
+Jika memakai ESP8266, ubah nilai SS_PIN, RST_PIN, SERVO_PIN di file .ino sesuai pin board.
